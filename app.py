@@ -49,100 +49,68 @@ app.layout = html.Div(children=[
     # html.Div(children='''
     #     Dash: A web application framework for Python.
     # '''),
+
+    # === Tweet Graph and Table
     html.Div([
-        html.Label('Top Count By'),
+        html.Label('Rank Tweet By'),
         dcc.Dropdown(
-            id='select-top-count-by',
+            id='select-rank-tweet-by',
             options=[
-                {'label': 'Tweet', 'value': 'text'},
-                {'label': 'Retweet from User', 'value': 'retweet_from_user'},
-                {'label': 'User', 'value': 'user'}
+                {'label': 'Count of Tweets', 'value': 'text'},
+                {'label': 'Number of Retweet', 'value': 'retweet_count'}                
             ],
             value='text'
         ),
-        dcc.Graph(id='live-top-count-graph'),
-        html.Div(id="live-top-count-table")
+        dcc.Graph(id='live-rank-tweet-graph'),
+        html.Div(id="live-rank-tweet-table")
     ],style={'width': '48%', 'display': 'inline-block'}),
+
+    # === User Graph and Table
     html.Div([
-        html.Label('Rank by'),
+        html.Label('Rank User By'),
         dcc.Dropdown(
-            id='select-rank-by',
+            id='select-rank-user-by',
             options=[
+                {'label': 'Number of Tweets by User', 'value': 'user'},
                 {'label': 'Number of Followers', 'value': 'user_follower_count'},
                 {'label': 'Number of Favorite', 'value': 'user_favorite_count'},
-                {'label': 'Number of Retweet', 'value': 'retweet_count'}
+                {'label': 'Number of Retweet from the User', 'value': 'retweet_from_user'}
             ],
-            value='user_follower_count'
+            value='user'
         ),
-        dcc.Graph(id='live-rank-graph'),
-        html.Div(id="live-rank-table")
+        dcc.Graph(id='live-rank-user-graph'),
+        html.Div(id="live-rank-user-table")
     ],style={'width': '48%', 'display': 'inline-block'})
 ])
 
+# === Tweets Ranking Graph
 @app.callback(
-    Output('live-top-count-graph', 'figure'),
-    [Input('select-top-count-by', 'value')]
+    Output('live-rank-tweet-graph', 'figure'),
+    [Input('select-rank-tweet-by', 'value')]
 )
-def update_graph(select_top_count_by):
-    output = get_top_count_by(df, select_top_count_by)
-    return {
-        'data': [
-                {'x': output.iloc[:, 0], 'y': output.iloc[:, 1], 'type': 'bar', 'name': 'Count'}
-            ],
-            'layout': {
-                'title': 'Basic Dash Example'
-            }
-    }
-
-@app.callback(
-    Output('live-rank-graph', 'figure'),
-    [Input('select-rank-by', 'value')]
-)
-def update_graph(select_rank_by):
-    if select_rank_by == 'user_follower_count':
-        output = get_rank_col_by_index_col(df, 'user_follower_count', 'user', 10)
-    elif select_rank_by == 'user_favorite_count':
-        output = get_rank_col_by_index_col(df, 'user_favorite_count', 'user', 10)
-    elif select_rank_by == 'retweet_count':
+def update_graph(select_rank_tweet_by):
+    if select_rank_tweet_by == 'text':
+        output = get_top_count_by(df, 'text')
+    elif select_rank_tweet_by == 'retweet_count':
         output = get_rank_col_by_index_col(df, 'retweet_count', 'text', 10)
     return {
         'data': [
                 {'x': output.iloc[:, 0], 'y': output.iloc[:, 1], 'type': 'bar', 'name': 'Count'}
             ],
             'layout': {
-                'title': 'Basic Dash Example'
+                'title': 'Tweet Ranking Table'
             }
     }
 
+# === Tweets Ranking Table
 @app.callback(
-    dash.dependencies.Output("live-top-count-table", "children"),
-    [dash.dependencies.Input("select-top-count-by", "value")],
+    dash.dependencies.Output("live-rank-tweet-table", "children"),
+    [dash.dependencies.Input("select-rank-tweet-by", "value")],
 )
-def update_output(select_top_count_by):
-    output = get_top_count_by(df, select_top_count_by)
-    return html.Div(
-        [
-            dash_table.DataTable(
-                data=output.to_dict('records'),
-                columns=[{"id": x, "name": x} for x in output.columns],
-                style_cell={'textAlign': 'left',
-                            'whiteSpace': 'normal',
-                            'height': 'auto',
-                            'width' : "500px"},
-            )
-        ]
-    )
-
-@app.callback(
-    dash.dependencies.Output("live-rank-table", "children"),
-    [dash.dependencies.Input("select-rank-by", "value")],
-)
-def update_output(select_rank_by):
-    if select_rank_by == 'user_follower_count':
-        output = get_rank_col_by_index_col(df, 'user_follower_count', 'user', 10)
-    elif select_rank_by == 'user_favorite_count':
-        output = get_rank_col_by_index_col(df, 'user_favorite_count', 'user', 10)
-    elif select_rank_by == 'retweet_count':
+def update_output(select_rank_tweet_by):
+    if select_rank_tweet_by == 'text':
+        output = get_top_count_by(df, 'text')
+    elif select_rank_tweet_by == 'retweet_count':
         output = get_rank_col_by_index_col(df, 'retweet_count', 'text', 10)
     return html.Div(
         [
@@ -156,6 +124,61 @@ def update_output(select_rank_by):
             )
         ]
     )
+
+# === User Ranking Graph
+@app.callback(
+    Output('live-rank-user-graph', 'figure'),
+    [Input('select-rank-user-by', 'value')]
+)
+def update_graph(select_rank_user_by):
+    if select_rank_user_by == 'user':
+        output = get_top_count_by(df, 'user')
+    elif select_rank_user_by == 'retweet_from_user':
+        output = get_top_count_by(df, 'retweet_from_user')
+    elif select_rank_user_by == 'user_favorite_count':
+        output = get_rank_col_by_index_col(df, 'user_favorite_count', 'user', 10)
+    elif select_rank_user_by == 'user_follower_count':
+        output = get_rank_col_by_index_col(df, 'user_follower_count', 'user', 10)
+    return {
+        'data': [
+                {'x': output.iloc[:, 0], 'y': output.iloc[:, 1], 'type': 'bar', 'name': 'Count'}
+            ],
+            'layout': {
+                'title': 'User Ranking Table'
+            }
+    }
+
+# === User Ranking Table
+@app.callback(
+    dash.dependencies.Output("live-rank-user-table", "children"),
+    [dash.dependencies.Input("select-rank-user-by", "value")],
+)
+def update_output(select_rank_user_by):
+    if select_rank_user_by == 'user':
+        output = get_top_count_by(df, 'user')
+    elif select_rank_user_by == 'retweet_from_user':
+        output = get_top_count_by(df, 'retweet_from_user')
+    elif select_rank_user_by == 'user_favorite_count':
+        output = get_rank_col_by_index_col(df, 'user_favorite_count', 'user', 10)
+    elif select_rank_user_by == 'user_follower_count':
+        output = get_rank_col_by_index_col(df, 'user_follower_count', 'user', 10)
+    return html.Div(
+        [
+            dash_table.DataTable(
+                data=output.to_dict('records'),
+                columns=[{"id": x, "name": x} for x in output.columns],
+                style_cell={'textAlign': 'left',
+                            'whiteSpace': 'normal',
+                            'height': 'auto',
+                            'width' : "500px"},
+            )
+        ]
+    )
+
+
+
+
+
 
 # def update_text(select_top_count_by):
 #     return 'You\'ve entered "{}"'.format(select_top_count_by)
