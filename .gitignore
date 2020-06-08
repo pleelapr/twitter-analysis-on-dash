@@ -1,6 +1,7 @@
 **/__pycache__/**
-**/data/**
-!**/data/clean_data.csv
+!data
+data/*
+!data/cleaned_data.csv
 venv
 *.pyc
 .DS_Store
