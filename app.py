@@ -11,7 +11,9 @@ import plotly
 from data_analysis import *
 import import_utils as iu
 
+import flask
 
+server = flask.Flask(__name__)
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 TOPIC = "#BlackLivesMatter"
