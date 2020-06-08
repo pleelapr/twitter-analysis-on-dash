@@ -11,9 +11,11 @@ import plotly
 from data_analysis import *
 import import_utils as iu
 
+
+
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 TOPIC = "#BlackLivesMatter"
-df = pd.read_csv('data/cleaned_data.csv')
+df = pd.read_csv('https://raw.githubusercontent.com/pleelapr/twitter-analysis-on-dash/master/data/cleaned_data.csv')
 
 def generate_table(dataframe, max_rows=10):
     return html.Table([
