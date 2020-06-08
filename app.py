@@ -11,10 +11,6 @@ import plotly
 from data_analysis import *
 import import_utils as iu
 
-import flask
-
-server = flask.Flask(__name__)
-
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 TOPIC = "#BlackLivesMatter"
 df = pd.read_csv('https://raw.githubusercontent.com/pleelapr/twitter-analysis-on-dash/master/data/cleaned_data.csv')
@@ -45,6 +41,7 @@ def generate_bar_chart(dataframe, title, id_name):
     )
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+server = app.server
 
 app.layout = html.Div(children=[
     html.H1(children='Twitter Analysis on '+TOPIC),
