@@ -1,0 +1,7 @@
+**/__pycache__/**
+**/data/**
+!**/data/clean_data.csv
+venv
+*.pyc
+.DS_Store
+.env
